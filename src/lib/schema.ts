@@ -120,6 +120,7 @@ const seo = z.object({
     'BeautySalon', 'HairSalon', 'NailSalon', 'DaySpa', 'HealthAndBeautyBusiness',
     'Store', 'ClothingStore', 'Florist', 'Bakery', 'ShoeStore', 'JewelryStore',
   ]),
+  rangoPrecio: z.enum(['€', '€€', '€€€', '€€€€']).optional(),
 });
 
 /* ───────────── Secciones ───────────── */
@@ -149,6 +150,8 @@ const secciones = z.object({
       z.object({ tipo: z.literal('video'), src: texto.regex(/^\/cliente\/.+\.(mp4|webm)$/), poster: imagen }),
     ]).optional(),
     panel: z.boolean().default(true), // panel translúcido con abierto/dirección/horario de hoy
+    // composición; si falta, la decide la variante (salud: dividido, belleza: editorial, comercio: fondo)
+    estilo: z.enum(['fondo', 'dividido', 'editorial']).optional(),
   }).optional(),
 
   marquee: z.object({
@@ -182,6 +185,8 @@ const secciones = z.object({
       destacado: z.boolean().default(false),
     })).min(1),
     nota: texto.optional(), // "Precios con IVA incluido"
+    // si falta, la decide la variante (salud y comercio: tarjetas, belleza: lista tipo carta)
+    estilo: z.enum(['tarjetas', 'lista']).optional(),
   }).optional(),
 
   equipo: z.object({
@@ -298,4 +303,7 @@ export const siteConfigSchema = z
   });
 
 export type SiteConfig = z.infer<typeof siteConfigSchema>;
+export type Secciones = SiteConfig['secciones'];
+export type SeccionKey = Exclude<keyof Secciones, 'orden'>;
+export type Dia = z.infer<typeof dia>;
 export type Imagen = z.infer<typeof imagen>;

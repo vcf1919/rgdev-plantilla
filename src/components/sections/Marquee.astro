@@ -1,0 +1,39 @@
+---
+/** MARQUEE de servicios en bucle (CSS). Se pausa al pasar el ratón. Código de PLANTILLA. */
+import { getSite } from '../../lib/config';
+import { anclaDe } from '../../lib/secciones';
+const { config } = getSite();
+const s = config.secciones.marquee!;
+const items = s.items ?? config.secciones.servicios!.items.map((i) => i.nombre);
+---
+<section class="marquee" id={anclaDe(config, 'marquee')} aria-label={items.join(', ')}>
+  <div class="marquee__track" aria-hidden="true">
+    {[0, 1].map(() => (
+      <ul role="list" class="marquee__group">
+        {items.map((it) => <li>{it}</li>)}
+      </ul>
+    ))}
+  </div>
+</section>
+
+<style>
+  .marquee { overflow: hidden; border-block: var(--rule); padding-block: clamp(1.1rem, 2.6vw, 1.6rem); }
+  .marquee__track { display: flex; inline-size: max-content; }
+  .marquee__group { display: flex; flex: none; }
+  .marquee li { display: flex; align-items: center; font-family: var(--font-display); font-size: clamp(1.5rem, 1.1rem + 2vw, 2.6rem); font-weight: var(--display-weight); letter-spacing: var(--display-tracking); line-height: 1.1; white-space: nowrap; padding-inline-end: clamp(1.75rem, 4vw, 3.25rem); }
+  .marquee li::after { content: ''; inline-size: 0.4em; block-size: 0.4em; margin-inline-start: clamp(1.75rem, 4vw, 3.25rem); background: var(--color-accent); border-radius: 50%; flex: none; }
+  :global([data-variante='belleza']) .marquee li { font-style: italic; font-weight: 400; }
+  :global([data-variante='belleza']) .marquee li::after { border-radius: 0; transform: rotate(45deg); inline-size: 0.28em; block-size: 0.28em; background: var(--color-primary); }
+  :global([data-variante='comercio']) .marquee { background: var(--color-accent); color: var(--color-on-accent); border: 0; }
+  :global([data-variante='comercio']) .marquee li::after { background: currentColor; }
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee__track { animation: marquee 38s linear infinite; }
+    .marquee:hover .marquee__track { animation-play-state: paused; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__group + .marquee__group { display: none; }
+    .marquee__track { inline-size: auto; }
+    .marquee__group { flex-wrap: wrap; row-gap: 0.5rem; padding-inline: var(--gutter); }
+  }
+</style>
