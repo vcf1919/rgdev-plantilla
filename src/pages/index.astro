@@ -5,7 +5,6 @@ import { getSite } from '../lib/config';
 import { resolveTheme } from '../themes';
 import { faqLd } from '../lib/seo';
 import Hero from '../components/sections/Hero.astro';
-import Marquee from '../components/sections/Marquee.astro';
 import Sobre from '../components/sections/Sobre.astro';
 import Servicios from '../components/sections/Servicios.astro';
 import Equipo from '../components/sections/Equipo.astro';
@@ -18,7 +17,7 @@ import CtaFinal from '../components/sections/CtaFinal.astro';
 
 const { config } = getSite();
 const { orden } = resolveTheme(config);
-const componentes = { hero: Hero, marquee: Marquee, sobre: Sobre, servicios: Servicios, equipo: Equipo, opiniones: Opiniones, galeria: Galeria, proceso: Proceso, faq: Faq, ubicacion: Ubicacion, ctaFinal: CtaFinal };
+const componentes = { hero: Hero, sobre: Sobre, servicios: Servicios, equipo: Equipo, opiniones: Opiniones, galeria: Galeria, proceso: Proceso, faq: Faq, ubicacion: Ubicacion, ctaFinal: CtaFinal };
 const faq = config.secciones.faq;
 const extraLd = faq && orden.includes('faq') ? [faqLd(faq.preguntas)] : [];
 ---

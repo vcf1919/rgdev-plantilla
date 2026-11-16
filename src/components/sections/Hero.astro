@@ -72,6 +72,12 @@ const sizes = estilo === 'dividido' ? '(min-width: 64rem) 46vw, 100vw' : '100vw'
   </div>
 </section>
 
+<script>
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLVideoElement>('.hero__video').forEach((v) => { v.removeAttribute('autoplay'); v.pause(); });
+  }
+</script>
+
 <style>
   .hero { position: relative; padding-block: clamp(2rem, 6vw, 4.5rem) clamp(3.5rem, 8vw, 6rem); }
   .hero__grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); position: relative; }

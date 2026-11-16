@@ -17,7 +17,7 @@ const url = z.url({ message: 'URL completa con https://' });
 
 /** Imagen optimizable. `src` es relativa a la carpeta de assets del cliente
  *  (src/assets/cliente/ en un cliente, examples/assets/<ejemplo>/ en los ejemplos). */
-const imagen = z.object({
+const imagen = z.strictObject({
   src: texto.regex(/\.(jpe?g|png|webp|avif|svg)$/i, 'Debe ser .jpg, .png, .webp, .avif o .svg'),
   alt: z.string().trim().min(3, 'El texto alternativo (alt) es obligatorio'),
 });
@@ -30,7 +30,7 @@ const dia = z.union([z.literal('cerrado'), z.array(tramo).min(1).max(3)]);
 
 /* ───────────── Bloques de datos ───────────── */
 
-const negocio = z.object({
+const negocio = z.strictObject({
   nombre: texto,
   sector: texto, // "Clínica dental", "Centro de estética"…
   eslogan: texto,
@@ -40,7 +40,7 @@ const negocio = z.object({
   logoClaro: imagen.optional(), // versión para fondos oscuros (footer, marcador del mapa)
 });
 
-const legal = z.object({
+const legal = z.strictObject({
   titular: texto, // persona física o razón social
   nif: texto.regex(/^[A-Z0-9]{9}$/i, 'NIF/CIF de 9 caracteres sin guiones'),
   domicilioFiscal: texto.optional(), // si difiere de la dirección del local
@@ -59,18 +59,18 @@ const redes = z
   })
   .partial();
 
-const contacto = z.object({
+const contacto = z.strictObject({
   telefono,
   whatsapp: telefono.optional(),
   email: z.email({ message: 'Email no válido' }),
-  direccion: z.object({
+  direccion: z.strictObject({
     calle: texto,
     cp: z.string().regex(/^\d{5}$/, 'Código postal de 5 cifras'),
     localidad: texto,
     provincia: texto,
     pais: z.string().length(2).default('ES'),
   }),
-  coordenadas: z.object({
+  coordenadas: z.strictObject({
     lat: z.number().min(-90).max(90),
     lng: z.number().min(-180).max(180),
   }),
@@ -78,7 +78,7 @@ const contacto = z.object({
   redes: redes.default({}),
 });
 
-const horario = z.object({
+const horario = z.strictObject({
   lunes: dia,
   martes: dia,
   miercoles: dia,
@@ -88,16 +88,16 @@ const horario = z.object({
   domingo: dia,
   nota: texto.optional(), // "Festivos nacionales cerrado"
   cierres: z
-    .array(z.object({ fecha: z.iso.date(), motivo: texto.optional() }))
+    .array(z.strictObject({ fecha: z.iso.date(), motivo: texto.optional() }))
     .default([]), // días puntuales cerrados (afecta a "Abierto ahora")
 });
 
 const reservas = z.discriminatedUnion('tipo', [
-  z.object({ tipo: z.literal('whatsapp'), numero: telefono.optional(), mensaje: texto.optional() }),
-  z.object({ tipo: z.literal('telefono'), numero: telefono.optional() }),
-  z.object({ tipo: z.literal('booksy'), url }),
-  z.object({ tipo: z.literal('url'), url }),
-]).and(z.object({ textoBoton: texto.default('Reservar cita') }));
+  z.strictObject({ tipo: z.literal('whatsapp'), numero: telefono.optional(), mensaje: texto.optional() }),
+  z.strictObject({ tipo: z.literal('telefono'), numero: telefono.optional() }),
+  z.strictObject({ tipo: z.literal('booksy'), url }),
+  z.strictObject({ tipo: z.literal('url'), url }),
+]).and(z.strictObject({ textoBoton: texto.default('Reservar cita') }));
 
 /** Tipografías disponibles (autoalojadas con @fontsource; cada preset usa una pareja). */
 export const FUENTES = [
@@ -105,13 +105,13 @@ export const FUENTES = [
   'familjen-grotesk', 'instrument-sans', 'literata', 'onest',
 ] as const;
 
-const tema = z.object({
+const tema = z.strictObject({
   variante: z.enum(['salud', 'belleza', 'comercio']),
-  colores: z.object({ primario: hex, acento: hex, fondo: hex }).partial().optional(),
-  tipografias: z.object({ titulos: z.enum(FUENTES), texto: z.enum(FUENTES) }).partial().optional(),
+  colores: z.strictObject({ primario: hex, acento: hex, fondo: hex }).partial().optional(),
+  tipografias: z.strictObject({ titulos: z.enum(FUENTES), texto: z.enum(FUENTES) }).partial().optional(),
 });
 
-const seo = z.object({
+const seo = z.strictObject({
   title: texto.max(65, 'Máximo 65 caracteres para que no se corte en Google'),
   description: texto.min(70).max(160, 'Entre 70 y 160 caracteres'),
   imagenOG: imagen, // se exporta a 1200×630
@@ -133,38 +133,34 @@ const base = {
   antetitulo: texto.optional(),
 };
 
-const secciones = z.object({
+const secciones = z.strictObject({
   orden: z.array(z.enum([
-    'hero', 'marquee', 'sobre', 'servicios', 'equipo', 'opiniones',
+    'hero', 'sobre', 'servicios', 'equipo', 'opiniones',
     'galeria', 'proceso', 'faq', 'ubicacion', 'ctaFinal',
   ])).optional(), // si falta, se usa el orden por defecto de la variante
 
-  hero: z.object({
+  hero: z.strictObject({
     ...base,
     titular: texto,
     subtitulo: texto.optional(),
-    ctaSecundario: z.object({ texto, href: texto }).optional(),
+    ctaSecundario: z.strictObject({ texto, href: texto }).optional(),
     fondo: z.discriminatedUnion('tipo', [
-      z.object({ tipo: z.literal('imagen'), imagen }),
+      z.strictObject({ tipo: z.literal('imagen'), imagen }),
       // el vídeo va en public/cliente/ (no se optimiza); el póster sí
-      z.object({ tipo: z.literal('video'), src: texto.regex(/^\/cliente\/.+\.(mp4|webm)$/), poster: imagen }),
+      z.strictObject({ tipo: z.literal('video'), src: texto.regex(/^\/cliente\/.+\.(mp4|webm)$/), poster: imagen }),
     ]).optional(),
     panel: z.boolean().default(true), // panel translúcido con abierto/dirección/horario de hoy
     // composición; si falta, la decide la variante (salud: dividido, belleza: editorial, comercio: fondo)
     estilo: z.enum(['fondo', 'dividido', 'editorial']).optional(),
   }).optional(),
 
-  marquee: z.object({
-    ...base,
-    items: z.array(texto).min(3).optional(), // si falta, usa los nombres de servicios
-  }).optional(),
 
-  sobre: z.object({
+  sobre: z.strictObject({
     ...base,
     titulo: texto,
     parrafos: z.array(texto).min(1),
     imagen: imagen.optional(),
-    cifras: z.array(z.object({
+    cifras: z.array(z.strictObject({
       valor: z.union([z.number(), z.literal('anios')]), // "anios" = calculado desde anioApertura
       prefijo: z.string().optional(),
       sufijo: z.string().optional(),
@@ -172,11 +168,11 @@ const secciones = z.object({
     })).max(4).default([]),
   }).optional(),
 
-  servicios: z.object({
+  servicios: z.strictObject({
     ...base,
     titulo: texto,
     intro: texto.optional(),
-    items: z.array(z.object({
+    items: z.array(z.strictObject({
       nombre: texto,
       descripcion: texto,
       precioDesde: z.number().positive().optional(), // € ; se muestra "desde 35 €"
@@ -189,11 +185,11 @@ const secciones = z.object({
     estilo: z.enum(['tarjetas', 'lista']).optional(),
   }).optional(),
 
-  equipo: z.object({
+  equipo: z.strictObject({
     ...base,
     titulo: texto,
     intro: texto.optional(),
-    miembros: z.array(z.object({
+    miembros: z.array(z.strictObject({
       nombre: texto,
       cargo: texto,
       frase: texto.optional(),
@@ -202,13 +198,13 @@ const secciones = z.object({
     })).min(1),
   }).optional(),
 
-  opiniones: z.object({
+  opiniones: z.strictObject({
     ...base,
     titulo: texto,
     notaMedia: z.number().min(1).max(5),
     totalResenas: z.number().int().positive(),
     urlGoogle: url,
-    resenas: z.array(z.object({
+    resenas: z.array(z.strictObject({
       autor: texto,
       nota: z.number().int().min(1).max(5),
       texto,
@@ -216,39 +212,39 @@ const secciones = z.object({
     })).min(6, 'Mínimo 6 reseñas para llenar las dos filas del carrusel'),
   }).optional(),
 
-  galeria: z.object({
+  galeria: z.strictObject({
     ...base,
     titulo: texto,
     intro: texto.optional(),
     imagenes: z.array(imagen.extend({ pie: texto.optional() })).min(3),
   }).optional(),
 
-  proceso: z.object({
+  proceso: z.strictObject({
     ...base,
     titulo: texto,
     intro: texto.optional(),
-    pasos: z.array(z.object({ titulo: texto, texto })).min(2).max(6),
+    pasos: z.array(z.strictObject({ titulo: texto, texto })).min(2).max(6),
   }).optional(),
 
-  faq: z.object({
+  faq: z.strictObject({
     ...base,
     titulo: texto,
-    preguntas: z.array(z.object({ pregunta: texto, respuesta: texto })).min(1),
+    preguntas: z.array(z.strictObject({ pregunta: texto, respuesta: texto })).min(1),
   }).optional(),
 
-  ubicacion: z.object({
+  ubicacion: z.strictObject({
     ...base,
     titulo: texto,
     texto: texto.optional(),
     indicaciones: z.array(texto).default([]), // "Parking gratuito en…", "Metro L1 parada…"
-    mapa: z.object({
+    mapa: z.strictObject({
       zoom: z.number().min(12).max(19).default(16.6),
       inclinacion: z.number().min(0).max(70).default(58),
       rotacion: z.number().min(-180).max(180).default(-18),
     }).default({ zoom: 16.6, inclinacion: 58, rotacion: -18 }),
   }).optional(),
 
-  ctaFinal: z.object({
+  ctaFinal: z.strictObject({
     ...base,
     titulo: texto,
     texto: texto.optional(),
@@ -260,7 +256,7 @@ const secciones = z.object({
 
 export const siteConfigSchema = z
   .object({
-    sitio: z.object({
+    sitio: z.strictObject({
       url, // dominio final, para canonical, sitemap y OG
       favicon: texto.regex(/^\/cliente\//, 'Debe estar en public/cliente/').optional(),
     }),
@@ -290,14 +286,6 @@ export const siteConfigSchema = z
         code: 'custom',
         path: ['reservas', 'numero'],
         message: 'Reservas por WhatsApp: indica reservas.numero o contacto.whatsapp',
-      });
-    }
-    // Marquee sin items y sin servicios de los que sacarlos
-    if (cfg.secciones.marquee && !cfg.secciones.marquee.items && !cfg.secciones.servicios) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['secciones', 'marquee', 'items'],
-        message: 'El marquee necesita items o una sección de servicios',
       });
     }
   });

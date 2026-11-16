@@ -38,7 +38,7 @@ export const comercio: Theme = {
     '--section-space': 'clamp(4.5rem, 10vw, 8rem)',
     '--rule': '1px solid var(--color-line)',
   },
-  orden: ['hero', 'marquee', 'servicios', 'galeria', 'sobre', 'opiniones', 'equipo', 'proceso', 'faq', 'ubicacion', 'ctaFinal'],
+  orden: ['hero', 'servicios', 'galeria', 'sobre', 'opiniones', 'equipo', 'proceso', 'faq', 'ubicacion', 'ctaFinal'],
   hero: 'fondo',
   servicios: 'tarjetas',
 };

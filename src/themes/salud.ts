@@ -38,7 +38,7 @@ export const salud: Theme = {
     '--section-space': 'clamp(4.5rem, 9vw, 7.5rem)',
     '--rule': '1px solid var(--color-line)',
   },
-  orden: ['hero', 'marquee', 'sobre', 'servicios', 'proceso', 'equipo', 'opiniones', 'galeria', 'faq', 'ubicacion', 'ctaFinal'],
+  orden: ['hero', 'sobre', 'servicios', 'proceso', 'equipo', 'opiniones', 'galeria', 'faq', 'ubicacion', 'ctaFinal'],
   hero: 'dividido',
   servicios: 'tarjetas',
 };

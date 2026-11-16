@@ -38,7 +38,7 @@ export const belleza: Theme = {
     '--section-space': 'clamp(5rem, 11vw, 9rem)',
     '--rule': '1px solid var(--color-line)',
   },
-  orden: ['hero', 'marquee', 'servicios', 'sobre', 'galeria', 'equipo', 'opiniones', 'proceso', 'faq', 'ubicacion', 'ctaFinal'],
+  orden: ['hero', 'servicios', 'sobre', 'galeria', 'equipo', 'opiniones', 'proceso', 'faq', 'ubicacion', 'ctaFinal'],
   hero: 'editorial',
   servicios: 'lista',
 };
